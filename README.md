@@ -8,19 +8,19 @@ declaration plus a call into the driver Adafruit already maintains. On Linux the
 drivers run through [Adafruit Blinka](https://github.com/adafruit/Adafruit_Blinka),
 which they depend on.
 
-> **Status: v0.1.0.** It passes the anolis-protocol 1.10.0 conformance harness
+> **Status: v0.2.0.** It passes the anolis-protocol 1.10.0 conformance harness
 > at level 2 in mock mode, from source and as the frozen release binary, on
-> x86_64 and arm64. Not yet verified on a Raspberry Pi. v0.1.0 has the BME280
-> only: the SHT4x, the SHTC3 and the Motor HAT are unreleased.
+> x86_64 and arm64. Not yet verified on a Raspberry Pi: v0.1.0's BME280 did not
+> load on one, which this release fixes.
 
 ## Supported boards
 
 | `type` | Board | Driver | Addresses | Since |
 | --- | --- | --- | --- | --- |
 | `bme280` | BME280 temperature, humidity and pressure (STEMMA QT) | `adafruit-circuitpython-bme280` | `0x77` (default), `0x76` | 0.1.0 |
-| `sht4x` | SHT40, SHT41 or SHT45 temperature and humidity (STEMMA QT) | `adafruit-circuitpython-sht4x` | `0x44` | unreleased |
-| `shtc3` | SHTC3 temperature and humidity (STEMMA QT) | `adafruit-circuitpython-shtc3` | `0x70` (fixed) | unreleased |
-| `motor_hat` | DC & Stepper Motor HAT for Raspberry Pi: four DC motors | `adafruit-circuitpython-pca9685`, `adafruit-circuitpython-motor` | `0x60` (default) to `0x7F`, except `0x70` | unreleased |
+| `sht4x` | SHT40, SHT41 or SHT45 temperature and humidity (STEMMA QT) | `adafruit-circuitpython-sht4x` | `0x44` | 0.2.0 |
+| `shtc3` | SHTC3 temperature and humidity (STEMMA QT) | `adafruit-circuitpython-shtc3` | `0x70` (fixed) | 0.2.0 |
+| `motor_hat` | DC & Stepper Motor HAT for Raspberry Pi: four DC motors | `adafruit-circuitpython-pca9685`, `adafruit-circuitpython-motor` | `0x60` (default) to `0x7F`, except `0x70` | 0.2.0 |
 
 All boards share one Linux I2C bus (`i2c_bus`, default 1: the Raspberry Pi
 header, and any STEMMA QT or Qwiic adapter on it).
@@ -44,7 +44,7 @@ devices:
     type: bme280
     address: 0x76
   - id: drive0
-    type: motor_hat   # unreleased: not accepted by 0.1.0
+    type: motor_hat
 ```
 
 `mock: true` replaces the bus with a simulated one holding a register model of
@@ -107,11 +107,8 @@ components:
   providers:
     adafruit:
       repo: anolishq/anolis-provider-adafruit
-      version: "0.1.0"
+      version: "0.2.0"
 ```
-
-0.1.0 accepts only `bme280` devices; a config with any other `type` fails its
-schema check until the next release.
 
 and give the runtime config an entry for it:
 
