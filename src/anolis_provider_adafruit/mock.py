@@ -401,7 +401,8 @@ class FakeBMP3xx(RegisterChip):
     Bosch's numbers.
 
     Modelled because a driver can get each of them wrong: power-on and the soft
-    reset command leave OSR at 0x02 and the chip asleep; a forced-mode write to
+    reset command leave the chip asleep and OSR at 0x00 (the datasheet's register
+    table says 0x02, but a BMP390 read 0x00 after a soft reset); a forced-mode write to
     PWR_CTRL measures once, only the quantities enabled, and returns to sleep;
     the data-ready bits are set by a measurement and cleared by reading the
     data."""
@@ -427,7 +428,6 @@ class FakeBMP3xx(RegisterChip):
         r[:] = bytes(256)
         r[self.CHIP_ID_REG] = self.CHIP_ID
         r[self.STATUS] = self.CMD_RDY
-        r[self.OSR] = 0x02
         r[self.CALIBRATION : self.CALIBRATION + 21] = struct.pack(
             "<HHbhhbbHHbbhbb", 27772, 18996, -10, 20000, -5352, 6, 0, 9000, 3000, -8, -2, 17000, 20, -60
         )
@@ -471,6 +471,8 @@ class FakeMPU6050(RegisterChip):
       every register 0 but WHO_AM_I and PWR_MGMT_1, whose sleep bit is set.
     - Asleep, the data registers hold their last values, so a restarted chip
       reads frozen rather than failing.
+    - Asleep, only PWR_MGMT_1 takes a write. Measured on GYRO_CONFIG with an
+      Adafruit 3886: a write asleep left it 0, the same write awake took.
     - WHO_AM_I reads 0x68 whichever address AD0 straps the chip to.
     """
 
@@ -497,8 +499,10 @@ class FakeMPU6050(RegisterChip):
     def on_write(self, register: int, value: int) -> None:
         if register == self.PWR_MGMT_1 and value & self.DEVICE_RESET:
             self.power_cycle()
-        elif register == self.SIGNAL_PATH_RESET:
-            pass  # clears itself
+        elif register == self.PWR_MGMT_1:
+            super().on_write(register, value)
+        elif self.registers[self.PWR_MGMT_1] & self.SLEEP or register == self.SIGNAL_PATH_RESET:
+            pass  # asleep, or a register that clears itself
         elif register not in range(self.ACCEL_OUT, self.GYRO_OUT + 6) and register != self.WHO_AM_I:
             super().on_write(register, value)
 

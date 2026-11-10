@@ -159,7 +159,7 @@ def test_a_chip_with_another_id_is_not_taken_for_a_bmp3xx() -> None:
 def test_bmp3xx_settings_read_back_from_the_chip() -> None:
     s = BMP3xx(FakeI2C({0x77: FakeBMP3xx()}), 0x77)
     assert s.read(["pressure_oversampling", "temperature_oversampling", "filter_coefficient"]) == {
-        "pressure_oversampling": 4,  # the chip's reset value, OSR 0x02
+        "pressure_oversampling": 1,  # OSR 0x00, as a BMP390 read after a soft reset
         "temperature_oversampling": 1,
         "filter_coefficient": 0,
     }
@@ -203,22 +203,22 @@ def test_mpu6050_readings_scale_with_the_ranges_set() -> None:
         "acceleration_x": pytest.approx(9.80665 / 2),
         "acceleration_y": pytest.approx(-9.80665 / 2),
         "acceleration_z": pytest.approx(9.80665),
-        "gyro_x": pytest.approx(math.radians(10.0)),  # 65.5 LSB per degree/s at the driver's 500 degrees/s
-        "gyro_y": pytest.approx(math.radians(-10.0)),
+        "gyro_x": pytest.approx(math.radians(5.0)),  # 131 LSB per degree/s at the chip's default 250 degrees/s
+        "gyro_y": pytest.approx(math.radians(-5.0)),
         "temperature": pytest.approx(-3920 / 340 + 36.53),
     }
     call("mpu6050", s, "set_accelerometer_range", range_g="4")
-    call("mpu6050", s, "set_gyro_range", range_dps="250")
+    call("mpu6050", s, "set_gyro_range", range_dps="500")
     assert s.read(["acceleration_x", "gyro_x"]) == {
         "acceleration_x": pytest.approx(9.80665),
-        "gyro_x": pytest.approx(math.radians(655 / 131)),
+        "gyro_x": pytest.approx(math.radians(10.0)),  # 65.5 LSB per degree/s
     }
 
 
 def test_mpu6050_settings_read_back_from_the_chip() -> None:
     s = MPU6050(FakeI2C({0x68: FakeMPU6050()}), 0x68)
     settings = ["accelerometer_range", "gyro_range", "filter_bandwidth"]
-    assert s.read(settings) == {"accelerometer_range": "2", "gyro_range": "500", "filter_bandwidth": "260"}
+    assert s.read(settings) == {"accelerometer_range": "2", "gyro_range": "250", "filter_bandwidth": "260"}
     call("mpu6050", s, "set_accelerometer_range", range_g="16")
     call("mpu6050", s, "set_gyro_range", range_dps="2000")
     call("mpu6050", s, "set_filter_bandwidth", bandwidth_hz="21")
@@ -261,3 +261,9 @@ def test_a_restarted_mpu6050_reads_frozen_through_the_driver_alone() -> None:
     sensor = adafruit_mpu6050.MPU6050(FakeI2C({0x68: chip}), 0x68)
     chip.power_cycle()
     assert sensor.acceleration == (0.0, 0.0, 0.0)
+
+
+def test_the_mpu6050_driver_writes_its_gyro_range_while_the_chip_ignores_it() -> None:
+    # Why the board starts at 250 degrees/s and not the driver's 500.
+    sensor = adafruit_mpu6050.MPU6050(FakeI2C({0x68: FakeMPU6050()}), 0x68)
+    assert sensor.gyro_range == adafruit_mpu6050.GyroRange.RANGE_250_DPS

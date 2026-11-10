@@ -2,8 +2,10 @@
 die temperature (STEMMA QT, I2C 0x68 or 0x69).
 
 Driver: adafruit-circuitpython-mpu6050. Its constructor checks the chip id,
-resets the chip, wakes it and sets the accelerometer to 2 g and the gyroscope
-to 500 degrees/s.
+resets the chip and wakes it. It writes a gyroscope range of 500 degrees/s
+before it wakes the chip, which ignores the write, so the board starts at the
+chip's defaults: 2 g and 250 degrees/s. The driver scales readings by the range
+it reads back, so they are correct either way.
 
 A chip that restarted on its own (a brown-out) comes back asleep, and its data
 registers stop changing while still reading, so the readings would freeze with
