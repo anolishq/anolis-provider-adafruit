@@ -5,9 +5,9 @@ the Adafruit CircuitPython driver that runs it, not by SKU. One driver usually
 covers several boards, so a row here is one unit of work: a module in
 `devices/` as described in [adding-a-board.md](adding-a-board.md).
 
-Supported today: `bme280`, `motor_hat` (PCA9685 with
-`adafruit-circuitpython-motor`), `sht4x` and `shtc3`. Everything else is a
-candidate.
+Supported today: `bme280`, `bmp3xx`, `lps22`, `motor_hat` (PCA9685 with
+`adafruit-circuitpython-motor`), `mpu6050`, `sht3x`, `sht4x` and `shtc3`.
+Everything else is a candidate.
 
 Sources, all retrieved 2026-11-03:
 
@@ -76,13 +76,13 @@ No Adafruit relay board appeared in the STEMMA QT category (searched names for
 | --- | --- | --- | --- | --- |
 | BME280 | `adafruit-circuitpython-bme280` | **supported** as `bme280` | 0x77, alt 0x76 | Product number not in the fetched sources. |
 | BME680 / BME688 | `adafruit-circuitpython-bme680` | BME680 (3660); BME688 (5046) | 0x77 | Adds a gas resistance reading. 5046 matched by name. |
-| BMP280 / BMP3xx / BMP5xx | `-bmp280`, `-bmp3xx`, `-bmp5xx` | BMP280 (2651); BMP388 (3966); BMP390 (4816); BMP5xx (6407, 6411, 6413) | 0x77 (BMP280, BMP3xx); 0x47 (BMP5xx) | Pressure only (plus temperature). |
+| BMP280 / BMP3xx / BMP5xx | `-bmp280`, `-bmp3xx`, `-bmp5xx` | BMP280 (2651); BMP388 (3966) and BMP390 (4816) **supported as `bmp3xx`**; BMP5xx (6407, 6411, 6413) | 0x77 (BMP280, BMP3xx); 0x47 (BMP5xx) | Pressure only (plus temperature). |
 | DPS310 | `adafruit-circuitpython-dps310` | DPS310 (4494) | 0x77 | |
-| LPS22 / LPS25 / LPS28 / LPS33/35 | `-lps2x`, `-lps28`, `-lps35hw` | LPS25 (4530); LPS22 (4633); LPS28 (6067); LPS33HW (4414); LPS35HW (4258) | 0x5D (lps2x, lps35hw); 0x5C (lps28) | LPS33HW is the water-resistant one. |
+| LPS22 / LPS25 / LPS28 / LPS33/35 | `-lps2x`, `-lps28`, `-lps35hw` | LPS25 (4530); LPS22 (4633) **supported as `lps22`**; LPS28 (6067); LPS33HW (4414); LPS35HW (4258) | 0x5D (lps2x, lps35hw); 0x5C (lps28) | LPS33HW is the water-resistant one. |
 | MPRLS ported pressure | `adafruit-circuitpython-mprls` | MPRLS (3965) | 0x18 | Gauge for pneumatic or vacuum lines. Not in the STEMMA QT category. |
 | MS8607 | `adafruit-circuitpython-ms8607` | MS8607 PHT (4716) | two addresses in source (0x40, 0x76) | |
 | SHT4x | `adafruit-circuitpython-sht4x` | SHT40 (4885); SHT41 (5776); SHT45 (5665); SHT45 with PTFE (6174) | 0x44 | **Supported** (`sht4x`). One driver, four boards. Only 4885 is linked from the driver; the rest are matched by name. |
-| SHT3x | `adafruit-circuitpython-sht31d` | SHT31-D (2857) | 0x44, alt 0x45 | |
+| SHT3x | `adafruit-circuitpython-sht31d` | SHT31-D (2857) **supported as `sht3x`** | 0x44, alt 0x45 | |
 | SHTC3, AHT20, HTU31D, HDC302x, Si7021, HTS221 | `-shtc3`, `-ahtx0`, `-htu31d`, `-hdc302x`, `-si7021`, `-hts221` | SHTC3 (4636); AHT20 (4566); HTU31 (4832); HDC3022 (5989); Si7021 (3251); HTS221 (4535) | 0x70; 0x38; 0x40/0x41; 0x44; 0x40; 0x5F | SHTC3 **supported** (`shtc3`); the others are candidates. Humidity alternatives; each its own driver. |
 | MCP9808 | `adafruit-circuitpython-mcp9808` | MCP9808 (5027; driver links 1782) | 0x18 | |
 | TMP117 | `adafruit-circuitpython-tmp117` | TMP117 (4821) | 0x48 | ±0.1 °C. Whether this driver also covers the TMP119 (6482) is **unconfirmed**. |
@@ -113,7 +113,7 @@ No Adafruit relay board appeared in the STEMMA QT category (searched names for
 | LSM6DS family (LSM6DSOX, LSM6DSO32, LSM6DS33, LSM6DS3TR-C, ISM330DHCX) | `adafruit-circuitpython-lsm6ds` | LSM6DSOX (4438); LSM6DS33 (4480); ISM330DHCX (4502); LSM6DSO32 (4692); combos with LIS3MDL (4485, 4517, 4565, 4569) | 0x6A | One driver, eight linked boards: the widest single family here. |
 | LIS3DH, ADXL34x, ADXL37x, LIS331, MSA301/311 | `-lis3dh`, `-adxl34x`, `-adxl37x`, `-lis331`, `-msa301` | LIS3DH (2809); ADXL345 (1231); ADXL375 (5374); LIS331/H3LIS331 (4626, 4627); MSA301 (4344), MSA311 (5309) | 0x18; 0x53; 0x53; 0x18; MSA301 0x26, MSA311 0x62 | Vibration and tilt. ADXL34x/37x boards also have SPI; only I2C is in scope. |
 | BNO055 / BNO08x fusion | `-bno055`, `-bno08x` | BNO055 (4646); BNO085 (4754) | 0x28; 0x4A | On-chip sensor fusion. |
-| ICM-20649 / ICM-20948, MPU-6050 | `-icm20x`, `-mpu6050` | ICM-20649 (4464); ICM-20948 (4554); MPU-6050 (3886) | 0x68 / 0x69; 0x68 | |
+| ICM-20649 / ICM-20948, MPU-6050 | `-icm20x`, `-mpu6050` | ICM-20649 (4464); ICM-20948 (4554); MPU-6050 (3886) **supported as `mpu6050`** | 0x68 / 0x69; 0x68 | |
 | Magnetometers and angle | `-lis3mdl`, `-lis2mdl`, `-mmc56x3`, `-mlx90393`, `-tlv493d`, `-tmag5273`, `-as5600` | LIS3MDL (4479); LIS2MDL (4488); MMC5603 (5579); MLX90393 (4022); TLV493D (4366); TMAG5273 (6489, 6490); AS5600 (6357) | 0x1C; 0x1E; 0x30; 0x0C; 0x5E; 0x35; 0x36 | AS5600 is a magnetic rotary-position sensor: shaft angle on a rig. |
 
 ## Distance and ToF

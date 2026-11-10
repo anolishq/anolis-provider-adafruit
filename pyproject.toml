@@ -1,6 +1,6 @@
 [project]
 name = "anolis-provider-adafruit"
-version = "0.2.0"
+version = "0.3.0"
 description = "Anolis device provider for Adafruit hardware, built on Adafruit's CircuitPython drivers"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -32,6 +32,10 @@ dependencies = [
     # needs a C compiler. The bounds are the ones Blinka asks for.
     "gpiod>=2.2.2,<3; sys_platform == 'linux'",
     "Adafruit-Blinka-Raspberry-Pi-PWM>=1.0.2,<2; sys_platform == 'linux'",
+    "adafruit-circuitpython-bmp3xx>=1.3,<2",
+    "adafruit-circuitpython-lps2x>=3,<4",
+    "adafruit-circuitpython-mpu6050>=1.3,<2",
+    "adafruit-circuitpython-sht31d>=2.3,<3",
 ]
 
 [project.optional-dependencies]
@@ -75,7 +79,7 @@ files = ["src", "tests"]
 
 [[tool.mypy.overrides]]
 # Generated protobuf modules and the CircuitPython drivers ship without type stubs.
-module = ["anolis.*", "adafruit_bme280.*", "adafruit_extended_bus", "adafruit_bus_device.*", "adafruit_motor.*", "adafruit_pca9685", "adafruit_sht4x", "adafruit_shtc3"]
+module = ["anolis.*", "adafruit_bme280.*", "adafruit_bmp3xx", "adafruit_lps2x", "adafruit_mpu6050", "adafruit_sht31d", "adafruit_extended_bus", "adafruit_bus_device.*", "adafruit_motor.*", "adafruit_pca9685", "adafruit_sht4x", "adafruit_shtc3"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

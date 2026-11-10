@@ -48,6 +48,19 @@ wheels = [
 ]
 
 [[package]]
+name = "adafruit-circuitpython-bmp3xx"
+version = "1.3.27"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adafruit-blinka" },
+    { name = "adafruit-circuitpython-busdevice" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9a/4e/6f77b8e03bb2c246501b32b5b4f2cfef1e13b1ec46a4a6ada7ba59a0c111/adafruit_circuitpython_bmp3xx-1.3.27.tar.gz", hash = "sha256:3e636b4c9cde00dafdf5af7a77f82298753483bcf81cb39c4517686839d38b2e", size = 24968, upload-time = "2026-04-23T20:54:51.812Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5d/8c/e4bd0893df90990824784e792074bcd99c5a06a948bc3f53c45577a7059a/adafruit_circuitpython_bmp3xx-1.3.27-py3-none-any.whl", hash = "sha256:271c18c7cf8be2ddb16dab2b7f21530be8f1b93292b7f9b1ac179223fb7b3416", size = 6671, upload-time = "2026-04-23T20:54:50.987Z" },
+]
+
+[[package]]
 name = "adafruit-circuitpython-busdevice"
 version = "5.2.17"
 source = { registry = "https://pypi.org/simple" }
@@ -73,6 +86,20 @@ wheels = [
 ]
 
 [[package]]
+name = "adafruit-circuitpython-lps2x"
+version = "3.0.15"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adafruit-blinka" },
+    { name = "adafruit-circuitpython-busdevice" },
+    { name = "adafruit-circuitpython-register" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/02/58/e11bb52fb45564e7416bb233eabc66cd7a0ab3b05bf137b051f5fcf61c75/adafruit_circuitpython_lps2x-3.0.15.tar.gz", hash = "sha256:229285affdb319938711085af5f33f29877722c6bfe4388585caafd7e2e7b689", size = 25020, upload-time = "2026-04-23T20:59:17.621Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b6/84/e2fb7955c47480ea4825e92140fc72dabd7da5f32ae33dc3e1de00a31880/adafruit_circuitpython_lps2x-3.0.15-py3-none-any.whl", hash = "sha256:675e934777f7815388c0e73b78f40cd3753a1112254afd3459ef98ce818996ea", size = 6600, upload-time = "2026-04-23T20:59:16.559Z" },
+]
+
+[[package]]
 name = "adafruit-circuitpython-motor"
 version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -83,6 +110,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/10/23/da2d513700ffc234a8e9146e4659d5aaa98c20a6def1bf9deae17ae5f6e1/adafruit_circuitpython_motor-3.5.0.tar.gz", hash = "sha256:806a0b0b9cd908b1e2446efdfad67eade6d8cf8849dd7fc564ffd59246781793", size = 31308, upload-time = "2026-07-28T13:54:10.654Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/13/00/6cc6ad731d95e694578211db6d155c6772808f3374290669ecd3111fdfbb/adafruit_circuitpython_motor-3.5.0-py3-none-any.whl", hash = "sha256:26ca2405e8f5e81976a8541667a49807a9d5a7a2e02065420837e052b3cc0c0f", size = 10909, upload-time = "2026-07-28T13:54:09.769Z" },
+]
+
+[[package]]
+name = "adafruit-circuitpython-mpu6050"
+version = "1.3.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adafruit-blinka" },
+    { name = "adafruit-circuitpython-busdevice" },
+    { name = "adafruit-circuitpython-register" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/74/fe/3fd04a1f889c16c005afe1126dd0442ca1bcf8dfea41b1ab4431b4f0eb45/adafruit_circuitpython_mpu6050-1.3.9.tar.gz", hash = "sha256:f63a5ff77af09a1c6475f77c4052356746cecaac25d44425d0c51b2aec3a1846", size = 27377, upload-time = "2026-09-05T01:52:15.08Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/20/e24136a3acebe8aaadba51a39f9d95d379713e96ba1f392579c4f7a83e81/adafruit_circuitpython_mpu6050-1.3.9-py3-none-any.whl", hash = "sha256:514cfe7b9900fbf8c31cd18988e4bace8b65525e4d8fbabf0d23c1a3be45a212", size = 7589, upload-time = "2026-09-05T01:52:14.041Z" },
 ]
 
 [[package]]
@@ -125,6 +166,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1b/3b/a2ba5a1cb0b78c97b62d32828bebcacae7000c38f81472e33434e07188a0/adafruit_circuitpython_requests-4.1.18.tar.gz", hash = "sha256:0bee3ea5d9bc0b5e5dc326712a97524b739f57c2199ff2e966b37ec18b51f20b", size = 69456, upload-time = "2026-10-30T13:46:37.756Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a5/14/5b897516dacacd17455074eef54632c19fce78136b610c83f8f676a74a4c/adafruit_circuitpython_requests-4.1.18-py3-none-any.whl", hash = "sha256:83b63cfd25ec45bec6401dd1f5109d8e262749bd4d1e8ad6e61d5a4a4a7f6dd5", size = 11022, upload-time = "2026-10-30T13:46:36.701Z" },
+]
+
+[[package]]
+name = "adafruit-circuitpython-sht31d"
+version = "2.3.31"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adafruit-blinka" },
+    { name = "adafruit-circuitpython-busdevice" },
+    { name = "adafruit-circuitpython-typing" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/75/f3/3b3b3a77280f2d2fddf3ef19cbfabd7bd474976a126b73dff49f1d00ffe8/adafruit_circuitpython_sht31d-2.3.31.tar.gz", hash = "sha256:1e05acfff571993fed0d677cd9598630155c0d145b5c50dcb6d3f1f43a74f8ff", size = 26039, upload-time = "2026-04-23T21:06:43.381Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a9/75/146b6c4878ae08283c42facb55be6c5a68aa5d74d0b29d6b6973e4c0629d/adafruit_circuitpython_sht31d-2.3.31-py3-none-any.whl", hash = "sha256:3ef8c83f54ef6f487fdcc98865db17d8a19b2b9e424778870b615260e1de80b8", size = 7687, upload-time = "2026-04-23T21:06:42.258Z" },
 ]
 
 [[package]]
@@ -231,13 +287,17 @@ provides-extras = ["conformance"]
 
 [[package]]
 name = "anolis-provider-adafruit"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "adafruit-blinka-raspberry-pi-pwm", marker = "sys_platform == 'linux'" },
     { name = "adafruit-circuitpython-bme280" },
+    { name = "adafruit-circuitpython-bmp3xx" },
+    { name = "adafruit-circuitpython-lps2x" },
     { name = "adafruit-circuitpython-motor" },
+    { name = "adafruit-circuitpython-mpu6050" },
     { name = "adafruit-circuitpython-pca9685" },
+    { name = "adafruit-circuitpython-sht31d" },
     { name = "adafruit-circuitpython-sht4x" },
     { name = "adafruit-circuitpython-shtc3" },
     { name = "adafruit-extended-bus" },
@@ -263,8 +323,12 @@ freeze = [
 requires-dist = [
     { name = "adafruit-blinka-raspberry-pi-pwm", marker = "sys_platform == 'linux'", specifier = ">=1.0.2,<2" },
     { name = "adafruit-circuitpython-bme280", specifier = ">=2.6,<3" },
+    { name = "adafruit-circuitpython-bmp3xx", specifier = ">=1.3,<2" },
+    { name = "adafruit-circuitpython-lps2x", specifier = ">=3,<4" },
     { name = "adafruit-circuitpython-motor", specifier = ">=3.5,<4" },
+    { name = "adafruit-circuitpython-mpu6050", specifier = ">=1.3,<2" },
     { name = "adafruit-circuitpython-pca9685", specifier = ">=3.4,<4" },
+    { name = "adafruit-circuitpython-sht31d", specifier = ">=2.3,<3" },
     { name = "adafruit-circuitpython-sht4x", specifier = ">=1.0,<2" },
     { name = "adafruit-circuitpython-shtc3", specifier = ">=1.1,<2" },
     { name = "adafruit-extended-bus", specifier = ">=1.0,<2" },

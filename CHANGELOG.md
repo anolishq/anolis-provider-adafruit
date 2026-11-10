@@ -6,6 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-09
+
+### Added
+
+- The Sensirion SHT31-D (`sht3x`), the ST LPS22 (`lps22`), the Bosch BMP388 and
+  BMP390 (`bmp3xx`) and the InvenSense MPU-6050 (`mpu6050`). The LPS22 and the
+  MPU-6050 stop measuring if they restart on their own, while their data
+  registers still read; the board finds that on the next read and sets the chip
+  up again, keeping the settings made. Settings are read back from the chip.
+
 ## [0.2.0] - 2026-11-09
 
 ### Added
@@ -101,6 +111,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `install.sh`, with the config schema assets the Workbench reads.
 - `scripts/cold_start.py`, which measures start-up time on the target.
 
-[Unreleased]: https://github.com/anolishq/anolis-provider-adafruit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/anolishq/anolis-provider-adafruit/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/anolishq/anolis-provider-adafruit/releases/tag/v0.3.0
 [0.2.0]: https://github.com/anolishq/anolis-provider-adafruit/releases/tag/v0.2.0
 [0.1.0]: https://github.com/anolishq/anolis-provider-adafruit/releases/tag/v0.1.0
