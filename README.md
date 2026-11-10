@@ -94,8 +94,13 @@ process crashes, nothing brakes them and they keep their last throttle until
 the motor supply is cut.
 
 The zero rung, `POST /v0/estop` and the brake on exit are a software stop,
-not an emergency stop. Cut the motor supply for an emergency stop. See the runtime's
-[safety guide](https://github.com/anolishq/anolis/blob/main/docs/safety.md).
+not an emergency stop. For an emergency stop, cut the HAT's logic supply as well
+as its motor supply. While a stop is in force the runtime writes nothing to the
+board, so a HAT whose logic stays powered keeps its last throttle and drives it
+again when the stop releases and the motor supply returns. With its logic cut,
+the PCA9685 comes back from the stop in its power-on state. Sensor boards belong
+on a supply the stop does not cut, so they keep their readings and settings. See
+the runtime's [safety guide](https://github.com/anolishq/anolis/blob/main/docs/safety.md).
 
 ## Install
 
