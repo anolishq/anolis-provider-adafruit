@@ -8,10 +8,10 @@ declaration plus a call into the driver Adafruit already maintains. On Linux the
 drivers run through [Adafruit Blinka](https://github.com/adafruit/Adafruit_Blinka),
 which they depend on.
 
-> **Status: v0.2.0.** It passes the anolis-protocol 1.10.0 conformance harness
+> **Status: v0.3.0.** It passes the anolis-protocol 1.10.0 conformance harness
 > at level 2 in mock mode, from source and as the frozen release binary, on
-> x86_64 and arm64. Not yet verified on a Raspberry Pi: v0.1.0's BME280 did not
-> load on one, which this release fixes.
+> x86_64 and arm64. On a Raspberry Pi 4, v0.2.0's binary ran the BME280, and the
+> SHT31-D, LPS22, BMP390 and MPU-6050 were read from a source install.
 
 ## Supported boards
 
@@ -20,10 +20,10 @@ which they depend on.
 | `bme280` | BME280 temperature, humidity and pressure (STEMMA QT) | `adafruit-circuitpython-bme280` | `0x77` (default), `0x76` | 0.1.0 |
 | `sht4x` | SHT40, SHT41 or SHT45 temperature and humidity (STEMMA QT) | `adafruit-circuitpython-sht4x` | `0x44` | 0.2.0 |
 | `shtc3` | SHTC3 temperature and humidity (STEMMA QT) | `adafruit-circuitpython-shtc3` | `0x70` (fixed) | 0.2.0 |
-| `sht3x` | SHT31-D temperature and humidity (STEMMA QT) | `adafruit-circuitpython-sht31d` | `0x44` (default), `0x45` | unreleased |
-| `lps22` | LPS22 pressure and temperature (STEMMA QT) | `adafruit-circuitpython-lps2x` | `0x5D` (default), `0x5C` | unreleased |
-| `bmp3xx` | BMP388 or BMP390 pressure and temperature (STEMMA QT) | `adafruit-circuitpython-bmp3xx` | `0x77` (default), `0x76` | unreleased |
-| `mpu6050` | MPU-6050 acceleration, rotation and die temperature (STEMMA QT) | `adafruit-circuitpython-mpu6050` | `0x68` (default), `0x69` | unreleased |
+| `sht3x` | SHT31-D temperature and humidity (STEMMA QT) | `adafruit-circuitpython-sht31d` | `0x44` (default), `0x45` | 0.3.0 |
+| `lps22` | LPS22 pressure and temperature (STEMMA QT) | `adafruit-circuitpython-lps2x` | `0x5D` (default), `0x5C` | 0.3.0 |
+| `bmp3xx` | BMP388 or BMP390 pressure and temperature (STEMMA QT) | `adafruit-circuitpython-bmp3xx` | `0x77` (default), `0x76` | 0.3.0 |
+| `mpu6050` | MPU-6050 acceleration, rotation and die temperature (STEMMA QT) | `adafruit-circuitpython-mpu6050` | `0x68` (default), `0x69` | 0.3.0 |
 | `motor_hat` | DC & Stepper Motor HAT for Raspberry Pi: four DC motors | `adafruit-circuitpython-pca9685`, `adafruit-circuitpython-motor` | `0x60` (default) to `0x7F`, except `0x70` | 0.2.0 |
 
 All boards share one Linux I2C bus (`i2c_bus`, default 1: the Raspberry Pi
@@ -111,7 +111,7 @@ components:
   providers:
     adafruit:
       repo: anolishq/anolis-provider-adafruit
-      version: "0.2.0"
+      version: "0.3.0"
 ```
 
 and give the runtime config an entry for it:
