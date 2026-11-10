@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The Sensirion SHT31-D (`sht3x`), the ST LPS22 (`lps22`), the Bosch BMP388 and
+  BMP390 (`bmp3xx`) and the InvenSense MPU-6050 (`mpu6050`). The LPS22 and the
+  MPU-6050 stop measuring if they restart on their own, while their data
+  registers still read; the board finds that on the next read and sets the chip
+  up again, keeping the settings made. Settings are read back from the chip.
+
 ## [0.2.0] - 2026-11-09
 
 ### Added

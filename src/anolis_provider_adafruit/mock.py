@@ -316,6 +316,203 @@ class FakeSHTC3(_SensirionHumidity):
             raise OSError(121, "Remote I/O error")
 
 
+class FakeSHT3x(_SensirionHumidity):
+    """A Sensirion SHT31 (datasheet version 7): two-byte commands, a measurement
+    reply of temperature and humidity words with CRCs, and a 32-bit serial
+    number. Raw values follow the datasheet's conversion,
+    T = -45 + 175 * raw / 65535 and RH = 100 * raw / 65535.
+
+    Only the commands the driver sends for a single-shot, high-repeatability
+    measurement with no clock stretching are modelled."""
+
+    BREAK, SOFT_RESET, SERIAL, MEASURE_HIGH = 0x3093, 0x30A2, 0x3780, 0x2400
+    SERIAL_NUMBER = 0x12345678
+
+    def write(self, data: bytes) -> None:
+        if not data:  # I2CDevice's probe: an empty write, acknowledged
+            return
+        command = int.from_bytes(data[:2], "big")
+        self._reply = b""
+        if command == self.MEASURE_HIGH:
+            t = round((self.temperature + 45) * 65535 / 175)
+            rh = round(self.humidity * 65535 / 100)
+            self._reply = sensirion_words(max(0, min(t, 0xFFFF)), max(0, min(rh, 0xFFFF)))
+        elif command == self.SERIAL:
+            self._reply = sensirion_words(self.SERIAL_NUMBER >> 16, self.SERIAL_NUMBER & 0xFFFF)
+        elif command not in (self.BREAK, self.SOFT_RESET):
+            raise OSError(121, "Remote I/O error")
+
+
+class FakeLPS22(RegisterChip):
+    """An ST LPS22HB. Pressure is 4096 LSB/hPa in 24 bits and temperature 100
+    LSB/C in 16 bits, both little-endian.
+
+    Modelled because a driver or the provider can get each of them wrong:
+
+    - The top bit of the register address asks for auto-increment and is not
+      part of the address.
+    - Power-on and a software reset (CTRL_REG2 bit 2, which clears itself)
+      leave the chip in one-shot mode with its data registers at 0.
+    - In one-shot mode nothing is measured, so the data registers hold their
+      last values and a restarted chip reads frozen rather than failing.
+    """
+
+    WHO_AM_I, CTRL_REG1, CTRL_REG2, DATA = 0x0F, 0x10, 0x11, 0x28
+    CHIP_ID = 0xB1
+    SWRESET, IF_ADD_INC = 0x04, 0x10
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.set_measurement(pressure=1013.25, temperature=22.5)
+        self.power_cycle()
+
+    def power_cycle(self) -> None:
+        """Every register at its power-on value, as at start-up, after a
+        software reset, or after a brown-out."""
+        r = self.registers
+        r[:] = bytes(256)
+        r[self.WHO_AM_I] = self.CHIP_ID
+        r[self.CTRL_REG2] = self.IF_ADD_INC
+
+    def set_measurement(self, *, pressure: float, temperature: float) -> None:
+        self.raw_pressure, self.raw_temperature = round(pressure * 4096), round(temperature * 100)
+
+    def write(self, data: bytes) -> None:
+        if data:
+            super().write(bytes([data[0] & 0x7F]) + data[1:])
+
+    def on_write(self, register: int, value: int) -> None:
+        if register == self.CTRL_REG2 and value & self.SWRESET:
+            self.power_cycle()
+        elif register in (self.CTRL_REG1, self.CTRL_REG2):
+            super().on_write(register, value)
+
+    def read(self, length: int) -> bytes:
+        if self.registers[self.CTRL_REG1] >> 4 & 0b111 and self.DATA <= self._pointer < self.DATA + 5:
+            self.registers[self.DATA : self.DATA + 3] = (self.raw_pressure & 0xFFFFFF).to_bytes(3, "little")
+            self.registers[self.DATA + 3 : self.DATA + 5] = struct.pack("<h", self.raw_temperature)
+        return super().read(length)
+
+
+class FakeBMP3xx(RegisterChip):
+    """A BMP390 (datasheet BST-BMP390-DS002). The calibration is made up, chosen
+    to give about 24 C and 1000 hPa: the datasheet gives no worked example, so
+    the readings pin the driver's conversion rather than check it against
+    Bosch's numbers.
+
+    Modelled because a driver can get each of them wrong: power-on and the soft
+    reset command leave the chip asleep and OSR at 0x00 (the datasheet's register
+    table says 0x02, but a BMP390 read 0x00 after a soft reset); a forced-mode write to
+    PWR_CTRL measures once, only the quantities enabled, and returns to sleep;
+    the data-ready bits are set by a measurement and cleared by reading the
+    data."""
+
+    CHIP_ID_REG, STATUS, DATA, PWR_CTRL, OSR, CONFIG, CALIBRATION, CMD = 0x00, 0x03, 0x04, 0x1B, 0x1C, 0x1F, 0x31, 0x7E
+    CHIP_ID = 0x60
+    CMD_RDY, DRDY_PRESS, DRDY_TEMP = 0x10, 0x20, 0x40
+    FORCED = 0b01
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.set_raw(pressure=9234259, temperature=8469940)
+        self.power_cycle()
+
+    def set_raw(self, *, pressure: int, temperature: int) -> None:
+        """24-bit ADC values the next measurement returns."""
+        self.raw_pressure, self.raw_temperature = pressure, temperature
+
+    def power_cycle(self) -> None:
+        """Every register at its power-on value (datasheet section 4.2), as at
+        start-up or after a soft reset."""
+        r = self.registers
+        r[:] = bytes(256)
+        r[self.CHIP_ID_REG] = self.CHIP_ID
+        r[self.STATUS] = self.CMD_RDY
+        r[self.CALIBRATION : self.CALIBRATION + 21] = struct.pack(
+            "<HHbhhbbHHbbhbb", 27772, 18996, -10, 20000, -5352, 6, 0, 9000, 3000, -8, -2, 17000, 20, -60
+        )
+
+    def on_write(self, register: int, value: int) -> None:
+        if register == self.CMD:
+            if value == 0xB6:
+                self.power_cycle()
+        elif register == self.PWR_CTRL:
+            self.registers[register] = value
+            if value >> 4 & 0b11 == self.FORCED:
+                self._measure(value)
+        elif register in (self.OSR, self.CONFIG):
+            super().on_write(register, value)
+
+    def _measure(self, control: int) -> None:
+        r = self.registers
+        if control & 0b01:
+            r[self.DATA : self.DATA + 3] = self.raw_pressure.to_bytes(3, "little")
+            r[self.STATUS] |= self.DRDY_PRESS
+        if control & 0b10:
+            r[self.DATA + 3 : self.DATA + 6] = self.raw_temperature.to_bytes(3, "little")
+            r[self.STATUS] |= self.DRDY_TEMP
+        r[self.PWR_CTRL] = control & 0b11  # back to sleep
+
+    def read(self, length: int) -> bytes:
+        data_read = self._pointer == self.DATA
+        out = super().read(length)
+        if data_read:
+            self.registers[self.STATUS] &= ~(self.DRDY_PRESS | self.DRDY_TEMP)
+        return out
+
+
+class FakeMPU6050(RegisterChip):
+    """An MPU-6050 (register map revision 4.2). Readings are big-endian signed
+    16-bit raw values; temperature is raw / 340 + 36.53.
+
+    Modelled because a driver or the provider can get each of them wrong:
+
+    - Power-on and DEVICE_RESET (PWR_MGMT_1 bit 7, which clears itself) leave
+      every register 0 but WHO_AM_I and PWR_MGMT_1, whose sleep bit is set.
+    - Asleep, the data registers hold their last values, so a restarted chip
+      reads frozen rather than failing.
+    - Asleep, only PWR_MGMT_1 takes a write. Measured on GYRO_CONFIG with an
+      Adafruit 3886: a write asleep left it 0, the same write awake took.
+    - WHO_AM_I reads 0x68 whichever address AD0 straps the chip to.
+    """
+
+    ACCEL_OUT, TEMP_OUT, GYRO_OUT, SIGNAL_PATH_RESET, PWR_MGMT_1, WHO_AM_I = 0x3B, 0x41, 0x43, 0x68, 0x6B, 0x75
+    DEVICE_ID = 0x68
+    DEVICE_RESET, SLEEP = 0x80, 0x40
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.set_raw(acceleration=(0, 0, 16384), temperature=-3920, gyro=(0, 0, 0))
+        self.power_cycle()
+
+    def power_cycle(self) -> None:
+        """Every register at its power-on value, as at start-up, after a device
+        reset, or after a brown-out."""
+        r = self.registers
+        r[:] = bytes(256)
+        r[self.WHO_AM_I] = self.DEVICE_ID
+        r[self.PWR_MGMT_1] = self.SLEEP
+
+    def set_raw(self, *, acceleration: tuple[int, int, int], temperature: int, gyro: tuple[int, int, int]) -> None:
+        self.raw = struct.pack(">hhhhhhh", *acceleration, temperature, *gyro)
+
+    def on_write(self, register: int, value: int) -> None:
+        if register == self.PWR_MGMT_1 and value & self.DEVICE_RESET:
+            self.power_cycle()
+        elif register == self.PWR_MGMT_1:
+            super().on_write(register, value)
+        elif self.registers[self.PWR_MGMT_1] & self.SLEEP or register == self.SIGNAL_PATH_RESET:
+            pass  # asleep, or a register that clears itself
+        elif register not in range(self.ACCEL_OUT, self.GYRO_OUT + 6) and register != self.WHO_AM_I:
+            super().on_write(register, value)
+
+    def read(self, length: int) -> bytes:
+        asleep = self.registers[self.PWR_MGMT_1] & self.SLEEP
+        if not asleep and self.ACCEL_OUT <= self._pointer < self.GYRO_OUT + 6:
+            self.registers[self.ACCEL_OUT : self.GYRO_OUT + 6] = self.raw
+        return super().read(length)
+
+
 class FakeI2C:
     """A bus with fake chips at fixed addresses. An address with no chip raises
     OSError, as Linux reports a NACK, so a driver's probe fails as on hardware.
