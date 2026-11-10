@@ -287,7 +287,7 @@ provides-extras = ["conformance"]
 
 [[package]]
 name = "anolis-provider-adafruit"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "adafruit-blinka-raspberry-pi-pwm", marker = "sys_platform == 'linux'" },
