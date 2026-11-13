@@ -10,8 +10,8 @@ which they depend on.
 
 > **Status: v0.3.0.** It passes the anolis-protocol 1.10.0 conformance harness
 > at level 2 in mock mode, from source and as the frozen release binary, on
-> x86_64 and arm64. On a Raspberry Pi 4, v0.2.0's binary ran the BME280, and the
-> SHT31-D, LPS22, BMP390 and MPU-6050 were read from a source install.
+> x86_64 and arm64. Which boards have run on real hardware, and on which
+> release: [Hardware support](https://anolishq.github.io/get-started/hardware).
 
 ## Supported boards
 
