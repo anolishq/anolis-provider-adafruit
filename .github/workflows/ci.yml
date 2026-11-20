@@ -89,6 +89,15 @@ jobs:
           BLINKA_FORCECHIP=BCM2712 BLINKA_FORCEBOARD=RASPBERRY_PI_5 uv run pytest -s tests/test_conformance.py
       - name: Cold start
         run: python3 scripts/cold_start.py dist/anolis-provider-adafruit config/conformance.yaml --runs 5
+      # The binary a release would ship, so a new board can be read on real
+      # hardware with it before the release, not only from a source install.
+      - name: Upload the frozen binary
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: anolis-provider-adafruit-${{ matrix.arch }}
+          path: dist/anolis-provider-adafruit
+          retention-days: 7
+          if-no-files-found: error
 
   docs:
     name: Docs
